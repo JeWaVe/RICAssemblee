@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace RICAssemblee.DataImport.RawData
 {
@@ -19,7 +20,7 @@ namespace RICAssemblee.DataImport.RawData
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
 
-        [JsonProperty("uid", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("uid")]
         public Uid Uid { get; set; }
 
         [JsonProperty("etatCivil", NullValueHandling = NullValueHandling.Ignore)]
@@ -98,13 +99,13 @@ namespace RICAssemblee.DataImport.RawData
     public class Mandat
     {
         [JsonProperty("@xsi:type", NullValueHandling = NullValueHandling.Ignore)]
-        public XsiType? XsiType { get; set; }
+        public MandatType? XsiType { get; set; }
 
         [JsonProperty("uid", NullValueHandling = NullValueHandling.Ignore)]
         public string Uid { get; set; }
 
         [JsonProperty("acteurRef", NullValueHandling = NullValueHandling.Ignore)]
-        public Text? ActeurRef { get; set; }
+        public string ActeurRef { get; set; }
 
         [JsonProperty("legislature")]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -164,7 +165,42 @@ namespace RICAssemblee.DataImport.RawData
     public class Collaborateurs
     {
         [JsonProperty("collaborateur", NullValueHandling = NullValueHandling.Ignore)]
-        public Collaborateur[] Collaborateur { get; set; }
+        [JsonConverter(typeof(CollaborateurConverter<Collaborateur>))]
+        public IEnumerable<Collaborateur> Collaborateur { get; set; }
+
+
+        internal class CollaborateurConverter<T> : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return (objectType == typeof(List<T>));
+            }
+
+            public override object ReadJson(
+              JsonReader reader,
+              Type objectType,
+              object existingValue,
+              JsonSerializer serializer)
+            {
+                JToken token = JToken.Load(reader);
+                if (token.Type == JTokenType.Array)
+                    return token.ToObject<List<T>>();
+                return new List<T> { token.ToObject<T>() };
+            }
+
+            public override bool CanWrite
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 
     public class Collaborateur
@@ -221,12 +257,6 @@ namespace RICAssemblee.DataImport.RawData
     {
         [JsonProperty("codeQualite", NullValueHandling = NullValueHandling.Ignore)]
         public Qualite? CodeQualite { get; set; }
-
-        [JsonProperty("libQualite", NullValueHandling = NullValueHandling.Ignore)]
-        public Qualite? LibQualite { get; set; }
-
-        [JsonProperty("libQualiteSex", NullValueHandling = NullValueHandling.Ignore)]
-        public LibQualiteSex? LibQualiteSex { get; set; }
     }
 
     public class Mandature
@@ -252,7 +282,41 @@ namespace RICAssemblee.DataImport.RawData
     public class Organes
     {
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
-        public string OrganeRef { get; set; }
+        [JsonConverter(typeof(OrganeRefConverter<string>))]
+        public IEnumerable<string> OrganeRef { get; set; }
+
+        internal class OrganeRefConverter<T> : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return (objectType == typeof(List<T>));
+            }
+
+            public override object ReadJson(
+              JsonReader reader,
+              Type objectType,
+              object existingValue,
+              JsonSerializer serializer)
+            {
+                JToken token = JToken.Load(reader);
+                if (token.Type == JTokenType.Array)
+                    return token.ToObject<List<T>>();
+                return new List<T> { token.ToObject<T>() };
+            }
+
+            public override bool CanWrite
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 
     public class Suppleants
@@ -296,19 +360,58 @@ namespace RICAssemblee.DataImport.RawData
         [JsonProperty("@xsi:type", NullValueHandling = NullValueHandling.Ignore)]
         public string XsiType { get; set; }
 
-        [JsonProperty("#text", NullValueHandling = NullValueHandling.Ignore)]
-        public Text? Text { get; set; }
+        [JsonProperty("#text")]
+        public string Text { get; set; }
     }
 
-    public enum Text { Pa441 };
+    public enum Qualite
+    { 
+        DeputeNonInscrit, 
+        Senateur,
+        Questeur,
+        Ministre,
+        EnMission,
+        AutreMembreDuBureau,
+        SecretaireDeLAssembleeNationale, 
+        VicePresidentDeLAssembleeNationale, 
+        CoRapporteur,
+        JugeTitulaire,
+        JugeSuppleant,
+        RapporteurBudgetairePourAvis, 
+        Rapporteur, 
+        RapporteurSpecial,
+        RapporteurGeneral, 
+        RapporteurThematique,
+        Membre, 
+        MembreDeDroit, 
+        MembreDeDroitDuBureau, 
+        MembreApparente, 
+        MembreSuppleant, 
+        MembreDesigneParLesGroupes, 
+        MembreTitulaire, 
+        QualiteMembre, 
+        Secretaire,
+        SecretaireGeneralAdjoint,
+        Suppleant, 
+        Titulaire, 
+        VicePresident,
+        PremierVicePresident,
+        CoPresident,
+        SecretaireDEtat,
+        TresorierAdjoint,
+        RepresentantDuPresidentDeGroupe,
+        President,
+        PresidentDeDroit,
+        PresidentDelegue,
+        PresidentExecutif,
+        PresidentDAge,
+        SecretaireDAge,
+        PresidentDeGroupe 
+    };
 
-    public enum Qualite { DéputéNonInscrit, Membre, MembreDeDroit, MembreDu, MembreSuppléant, MembreTitulaire, QualiteMembre, Secrétaire, Suppléant, Titulaire, VicePrésident };
+    public enum TypeOrgane { MisinfoPre, Api, Cjr, Assemblee, Senat, DelegSenat, ComSpSenat, Gouvernement, GroupeSenat, ComSenat, Ministere, Cnps, Confpt, Cnpe, Cmp, Comper, Comnl, Gevi, OffPar, Deleg, Ga, Ge, Gp, MisInfo, MisInfoCom, Orgextparl, Parpol, DelegBureau };
 
-    public enum LibQualiteSex { DéputéeNonInscrite, LibQualiteSexMembre, Membre, MembreDeDroit, MembreDu, MembreSuppléante, MembreTitulaire, Secrétaire, VicePrésidente };
-
-    public enum TypeOrgane { Assemblee, Cnps, Comper, Deleg, Ga, Ge, Gp, Misinfo, Orgextparl, Parpol };
-
-    public enum XsiType { MandatMissionType, MandatParlementaireType, MandatSimpleType };
+    public enum MandatType { MandatMission, MandatParlementaire, MandatSimple, MandatAvecSuppleant };
 
     public static class Serialize
     {
@@ -324,9 +427,7 @@ namespace RICAssemblee.DataImport.RawData
             Converters =
             {
                 XsiTypeConverter.Singleton,
-                TextConverter.Singleton,
                 QualiteConverter.Singleton,
-                LibQualiteSexConverter.Singleton,
                 TypeOrganeConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
@@ -335,7 +436,7 @@ namespace RICAssemblee.DataImport.RawData
 
     internal class XsiTypeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(XsiType) || t == typeof(XsiType?);
+        public override bool CanConvert(Type t) => t == typeof(MandatType) || t == typeof(MandatType?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -344,11 +445,13 @@ namespace RICAssemblee.DataImport.RawData
             switch (value)
             {
                 case "MandatMission_Type":
-                    return XsiType.MandatMissionType;
+                    return MandatType.MandatMission;
                 case "MandatParlementaire_type":
-                    return XsiType.MandatParlementaireType;
+                    return MandatType.MandatParlementaire;
                 case "MandatSimple_Type":
-                    return XsiType.MandatSimpleType;
+                    return MandatType.MandatSimple;
+                case "MandatAvecSuppleant_Type":
+                    return MandatType.MandatAvecSuppleant;
             }
             throw new Exception("Cannot unmarshal type XsiType");
         }
@@ -360,16 +463,16 @@ namespace RICAssemblee.DataImport.RawData
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (XsiType)untypedValue;
+            var value = (MandatType)untypedValue;
             switch (value)
             {
-                case XsiType.MandatMissionType:
+                case MandatType.MandatMission:
                     serializer.Serialize(writer, "MandatMission_Type");
                     return;
-                case XsiType.MandatParlementaireType:
+                case MandatType.MandatParlementaire:
                     serializer.Serialize(writer, "MandatParlementaire_type");
                     return;
-                case XsiType.MandatSimpleType:
+                case MandatType.MandatSimple:
                     serializer.Serialize(writer, "MandatSimple_Type");
                     return;
             }
@@ -377,40 +480,6 @@ namespace RICAssemblee.DataImport.RawData
         }
 
         public static readonly XsiTypeConverter Singleton = new XsiTypeConverter();
-    }
-
-    internal class TextConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(Text) || t == typeof(Text?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            if (value == "PA441")
-            {
-                return Text.Pa441;
-            }
-            throw new Exception("Cannot unmarshal type Text");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (Text)untypedValue;
-            if (value == Text.Pa441)
-            {
-                serializer.Serialize(writer, "PA441");
-                return;
-            }
-            throw new Exception("Cannot marshal type Text");
-        }
-
-        public static readonly TextConverter Singleton = new TextConverter();
     }
 
     internal class ParseStringConverter : JsonConverter
@@ -422,7 +491,7 @@ namespace RICAssemblee.DataImport.RawData
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
             long l;
-            if (Int64.TryParse(value, out l))
+            if (Int64.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out l))
             {
                 return l;
             }
@@ -452,30 +521,108 @@ namespace RICAssemblee.DataImport.RawData
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            switch (value)
+            switch (value.ToLowerInvariant())
             {
-                case "Député non-inscrit":
-                    return Qualite.DéputéNonInscrit;
-                case "Membre":
-                    return Qualite.Membre;
-                case "Membre de droit":
-                    return Qualite.MembreDeDroit;
-                case "Membre du":
-                    return Qualite.MembreDu;
-                case "Membre suppléant":
-                    return Qualite.MembreSuppléant;
-                case "Membre titulaire":
-                    return Qualite.MembreTitulaire;
-                case "Secrétaire":
-                    return Qualite.Secrétaire;
-                case "Suppléant":
-                    return Qualite.Suppléant;
-                case "Titulaire":
-                    return Qualite.Titulaire;
-                case "Vice-Président":
-                    return Qualite.VicePrésident;
+                case "autre membre du bureau":
+                    return Qualite.AutreMembreDuBureau;
+                case "questeur":
+                    return Qualite.Questeur;
+                case "député non-inscrit":
+                    return Qualite.DeputeNonInscrit;
+                case "sénateur":
+                    return Qualite.Senateur;
+                case "ministre délégué":
+                case "ministre d'état":
+                case "ministre":
+                    return Qualite.Ministre;
+                case "en mission":
+                    return Qualite.EnMission;
+                case "secrétaire de l'assemblée nationale":
+                    return Qualite.SecretaireDeLAssembleeNationale;
+                case "vice-président de l'assemblée nationale":
+                    return Qualite.VicePresidentDeLAssembleeNationale;
+                case "rapporteur budgétaire pour avis":
+                    return Qualite.RapporteurBudgetairePourAvis;
+                case "juge titulaire":
+                    return Qualite.JugeTitulaire;
+                case "juge suppléant":
+                    return Qualite.JugeSuppleant;
+                case "co-rapporteur":
+                    return Qualite.CoRapporteur;
+                case "rapporteur":
+                    return Qualite.Rapporteur;
+                case "rapporteur spécial au nom de la commission des finances sur le budget de l'agriculture et de la pêche (agriculture)":
+                case "rapporteur spécial au nom de la commission des finances : agriculture, pêche, forêt et affaires rurales; développement agricole et rural":
+                case "rapporteur spécial au nom de la commission des finances : agriculture, pêche, forêt, et affaires rurales; développement agricole et rural":
+                case "rapporteur spécial au nom de la commission des finances : administration générale et territoriale de l'état":
+                case "rapporteur spécial":
+                    return Qualite.RapporteurSpecial;
+                case "rapporteur thématique":
+                    return Qualite.RapporteurThematique;
+                case "rapporteur général":
+                    return Qualite.RapporteurGeneral;
                 case "membre":
-                    return Qualite.QualiteMembre;
+                case "membre rattaché":
+                case "membre nommé par le président de l'assemblée nationale":
+                case "membre du":
+                    return Qualite.Membre;
+                case "membre de droit":
+                case "membre de droit (représentant de la commission des finances)":
+                case "membre de droit (représentant de la commission des affaires étrangères)":
+                case "membre de droit(rapporteur du projet de loi de financement de la séc.sociale)":
+                case "membre de droit (rapporteur du projet de loi de financement de la séc. sociale)":
+                case "membre de droit (président de la commission de la défense)":
+                case "membre de droit (président de la commission des lois)":
+                case "membre de droit (représentante de la commission des affaires culturelles)":
+                    return Qualite.MembreDeDroit;
+                case "membre de droit du bureau":
+                    return Qualite.MembreDeDroitDuBureau;
+                case "membre apparenté":
+                    return Qualite.MembreApparente;
+                case "membre suppléant":
+                    return Qualite.MembreSuppleant;
+                case "membre désigné par les groupes":
+                    return Qualite.MembreDesigneParLesGroupes;
+                case "membre titulaire":
+                    return Qualite.MembreTitulaire;
+                case "secrétaire":
+                    return Qualite.Secretaire;
+                case "secrétaire général-adjoint":
+                    return Qualite.SecretaireGeneralAdjoint;
+                case "président de droit":
+                    return Qualite.PresidentDeDroit;
+                case "suppléant":
+                    return Qualite.Suppleant;
+                case "titulaire":
+                    return Qualite.Titulaire;
+                case "vice-président, co-rapporteur": // forget about co-rapporteur in that case
+                case "vice-président":
+                case "deuxième vice-président":
+                    return Qualite.VicePresident;
+                case "premier vice-président":
+                    return Qualite.PremierVicePresident;
+                case "président":
+                case "président-rapporteur": // forget about rapporteur when president
+                case "président du":
+                    return Qualite.President;
+                case "président de groupe":
+                    return Qualite.PresidentDeGroupe;
+                case "secrétaire d'âge":
+                    return Qualite.SecretaireDAge;
+                case "président délégué":
+                    return Qualite.PresidentDelegue;
+                case "président exécutif":
+                    return Qualite.PresidentExecutif;
+                case "secrétaire d'état":
+                    return Qualite.SecretaireDEtat;
+                case "trésorier adjoint":
+                    return Qualite.TresorierAdjoint;
+                case "représentant du président de groupe":
+                    return Qualite.RepresentantDuPresidentDeGroupe;
+                case "président d'âge":
+                    return Qualite.PresidentDAge;
+                case "co-président":
+                    return Qualite.CoPresident;
             }
             throw new Exception("Cannot unmarshal type Qualite");
         }
@@ -490,7 +637,7 @@ namespace RICAssemblee.DataImport.RawData
             var value = (Qualite)untypedValue;
             switch (value)
             {
-                case Qualite.DéputéNonInscrit:
+                case Qualite.DeputeNonInscrit:
                     serializer.Serialize(writer, "Député non-inscrit");
                     return;
                 case Qualite.Membre:
@@ -499,25 +646,22 @@ namespace RICAssemblee.DataImport.RawData
                 case Qualite.MembreDeDroit:
                     serializer.Serialize(writer, "Membre de droit");
                     return;
-                case Qualite.MembreDu:
-                    serializer.Serialize(writer, "Membre du");
-                    return;
-                case Qualite.MembreSuppléant:
+                case Qualite.MembreSuppleant:
                     serializer.Serialize(writer, "Membre suppléant");
                     return;
                 case Qualite.MembreTitulaire:
                     serializer.Serialize(writer, "Membre titulaire");
                     return;
-                case Qualite.Secrétaire:
+                case Qualite.Secretaire:
                     serializer.Serialize(writer, "Secrétaire");
                     return;
-                case Qualite.Suppléant:
+                case Qualite.Suppleant:
                     serializer.Serialize(writer, "Suppléant");
                     return;
                 case Qualite.Titulaire:
                     serializer.Serialize(writer, "Titulaire");
                     return;
-                case Qualite.VicePrésident:
+                case Qualite.VicePresident:
                     serializer.Serialize(writer, "Vice-Président");
                     return;
                 case Qualite.QualiteMembre:
@@ -530,82 +674,6 @@ namespace RICAssemblee.DataImport.RawData
         public static readonly QualiteConverter Singleton = new QualiteConverter();
     }
 
-    internal class LibQualiteSexConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(LibQualiteSex) || t == typeof(LibQualiteSex?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Députée non-inscrite":
-                    return LibQualiteSex.DéputéeNonInscrite;
-                case "Membre":
-                    return LibQualiteSex.Membre;
-                case "Membre de droit":
-                    return LibQualiteSex.MembreDeDroit;
-                case "Membre du":
-                    return LibQualiteSex.MembreDu;
-                case "Membre suppléante":
-                    return LibQualiteSex.MembreSuppléante;
-                case "Membre titulaire":
-                    return LibQualiteSex.MembreTitulaire;
-                case "Secrétaire":
-                    return LibQualiteSex.Secrétaire;
-                case "Vice-Présidente":
-                    return LibQualiteSex.VicePrésidente;
-                case "membre":
-                    return LibQualiteSex.LibQualiteSexMembre;
-            }
-            throw new Exception("Cannot unmarshal type LibQualiteSex");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (LibQualiteSex)untypedValue;
-            switch (value)
-            {
-                case LibQualiteSex.DéputéeNonInscrite:
-                    serializer.Serialize(writer, "Députée non-inscrite");
-                    return;
-                case LibQualiteSex.Membre:
-                    serializer.Serialize(writer, "Membre");
-                    return;
-                case LibQualiteSex.MembreDeDroit:
-                    serializer.Serialize(writer, "Membre de droit");
-                    return;
-                case LibQualiteSex.MembreDu:
-                    serializer.Serialize(writer, "Membre du");
-                    return;
-                case LibQualiteSex.MembreSuppléante:
-                    serializer.Serialize(writer, "Membre suppléante");
-                    return;
-                case LibQualiteSex.MembreTitulaire:
-                    serializer.Serialize(writer, "Membre titulaire");
-                    return;
-                case LibQualiteSex.Secrétaire:
-                    serializer.Serialize(writer, "Secrétaire");
-                    return;
-                case LibQualiteSex.VicePrésidente:
-                    serializer.Serialize(writer, "Vice-Présidente");
-                    return;
-                case LibQualiteSex.LibQualiteSexMembre:
-                    serializer.Serialize(writer, "membre");
-                    return;
-            }
-            throw new Exception("Cannot marshal type LibQualiteSex");
-        }
-
-        public static readonly LibQualiteSexConverter Singleton = new LibQualiteSexConverter();
-    }
-
     internal class TypeOrganeConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(TypeOrgane) || t == typeof(TypeOrgane?);
@@ -616,12 +684,46 @@ namespace RICAssemblee.DataImport.RawData
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "MISINFOPRE":
+                    return TypeOrgane.MisinfoPre;
                 case "ASSEMBLEE":
                     return TypeOrgane.Assemblee;
+                case "SENAT":
+                    return TypeOrgane.Senat;
+                case "DELEGSENAT":
+                    return TypeOrgane.DelegSenat;
+                case "COMSPSENAT":
+                    return TypeOrgane.ComSpSenat;
+                case "GOUVERNEMENT":
+                    return TypeOrgane.Gouvernement;
+                case "GROUPESENAT":
+                    return TypeOrgane.GroupeSenat;
+                case "COMSENAT":
+                    return TypeOrgane.ComSenat;
+                case "MINISTERE":
+                    return TypeOrgane.Ministere;
+                case "MISINFOCOM":
+                    return TypeOrgane.MisInfoCom;
                 case "CNPS":
                     return TypeOrgane.Cnps;
+                case "CNPE":
+                    return TypeOrgane.Cnpe;
+                case "CMP":
+                    return TypeOrgane.Cmp;
+                case "CONFPT":
+                    return TypeOrgane.Confpt;
+                case "CJR":
+                    return TypeOrgane.Cjr;
+                case "API":
+                    return TypeOrgane.Api;
                 case "COMPER":
                     return TypeOrgane.Comper;
+                case "COMNL":
+                    return TypeOrgane.Comnl;
+                case "OFFPAR":
+                    return TypeOrgane.OffPar;
+                case "GEVI":
+                    return TypeOrgane.Gevi;
                 case "DELEG":
                     return TypeOrgane.Deleg;
                 case "GA":
@@ -631,11 +733,13 @@ namespace RICAssemblee.DataImport.RawData
                 case "GP":
                     return TypeOrgane.Gp;
                 case "MISINFO":
-                    return TypeOrgane.Misinfo;
+                    return TypeOrgane.MisInfo;
                 case "ORGEXTPARL":
                     return TypeOrgane.Orgextparl;
                 case "PARPOL":
                     return TypeOrgane.Parpol;
+                case "DELEGBUREAU":
+                    return TypeOrgane.DelegBureau;
             }
             throw new Exception("Cannot unmarshal type TypeOrgane");
         }
@@ -671,7 +775,7 @@ namespace RICAssemblee.DataImport.RawData
                 case TypeOrgane.Gp:
                     serializer.Serialize(writer, "GP");
                     return;
-                case TypeOrgane.Misinfo:
+                case TypeOrgane.MisInfo:
                     serializer.Serialize(writer, "MISINFO");
                     return;
                 case TypeOrgane.Orgextparl:
