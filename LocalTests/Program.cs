@@ -1,9 +1,7 @@
 ﻿using RICAssemblee.DataImport.RawData;
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Net;
 
 namespace LocalTests
 {
@@ -15,12 +13,14 @@ namespace LocalTests
 
             //ZipFile.ExtractToDirectory("acteurs.zip", "acteurs");
 
-            var allDeputes = Directory.GetFiles("acteurs/organe").Select(f =>
+            var allDeputes = Directory.GetFiles("acteurs/acteur").Select(f =>
             {
                 string content = File.ReadAllText(f);
                 try
                 {
-                    return RawOrgane.FromJson(content).Organe;
+                    var result = RawActeur.FromJson(content).Acteur;
+
+                    return result;
                 }
                 catch (Exception e)
                 {

@@ -16,13 +16,13 @@ namespace RICAssemblee.DataImport.RawData
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
 
-        [JsonProperty("uid", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("uid")]
         public string Uid { get; set; }
 
         [JsonProperty("codeType", NullValueHandling = NullValueHandling.Ignore)]
-        public string CodeType { get; set; }
+        public TypeOrgane CodeType { get; set; }
 
-        [JsonProperty("libelle", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("libelle")]
         public string Libelle { get; set; }
 
         [JsonProperty("libelleEdition", NullValueHandling = NullValueHandling.Ignore)]
@@ -38,10 +38,10 @@ namespace RICAssemblee.DataImport.RawData
         public ViMoDe ViMoDe { get; set; }
 
         [JsonProperty("organeParent")]
-        public object OrganeParent { get; set; }
+        public string OrganeParent { get; set; }
 
         [JsonProperty("chambre")]
-        public object Chambre { get; set; }
+        public string Chambre { get; set; }
 
         [JsonProperty("regime", NullValueHandling = NullValueHandling.Ignore)]
         public string Regime { get; set; }
@@ -57,10 +57,10 @@ namespace RICAssemblee.DataImport.RawData
     public partial class Secretariat
     {
         [JsonProperty("secretaire01")]
-        public object Secretaire01 { get; set; }
+        public string Secretaire01 { get; set; }
 
         [JsonProperty("secretaire02")]
-        public object Secretaire02 { get; set; }
+        public string Secretaire02 { get; set; }
     }
 
     public partial class ViMoDe
