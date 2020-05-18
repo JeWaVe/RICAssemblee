@@ -15,16 +15,12 @@ namespace LocalTests
 
             //ZipFile.ExtractToDirectory("acteurs.zip", "acteurs");
 
-            var allDeputes = Directory.GetFiles("acteurs/acteur").Select(f =>
+            var allDeputes = Directory.GetFiles("acteurs/organe").Select(f =>
             {
                 string content = File.ReadAllText(f);
                 try
                 {
-                    if (f.Contains("PA267233.json"))
-                    {
-
-                    }
-                    return RawActeur.FromJson(content).Acteur;
+                    return RawOrgane.FromJson(content).Organe;
                 }
                 catch (Exception e)
                 {
