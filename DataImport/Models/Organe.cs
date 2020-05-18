@@ -14,8 +14,9 @@ namespace RICAssemblee.DataImport.Models
 
         public Organe Parent { get; set; }
 
-        internal static List<Organe> Parse(IEnumerable<RawData.Organe> rawOrganes)
+        internal static IEnumerable<Organe> Parse(IEnumerable<RawData.Organe> rawOrganes)
         {
+            // TODO: faster
             var tmp = new Dictionary<string, Organe>();
             foreach (var rawOrgane in rawOrganes)
             {
@@ -38,10 +39,10 @@ namespace RICAssemblee.DataImport.Models
                 }
             }
 
-            return tmp.Values.ToList();
+            return tmp.Values;
         }
 
-        public static List<Organe> FromDirectory(string path)
+        public static IEnumerable<Organe> FromDirectory(string path)
         {
             return Parse(RawOrgane.FromDirectory(path));
         }
