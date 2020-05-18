@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace RICAssemblee.DataImport.RawData
 {
-    public class RawActeur
+    internal class RawActeur
     {
         [JsonProperty("acteur", NullValueHandling = NullValueHandling.Ignore)]
         public Acteur Acteur { get; set; }
         public static RawActeur FromJson(string json) => JsonConvert.DeserializeObject<RawActeur>(json, Converter.Settings);
     }
 
-    public class Acteur
+    internal class Acteur
     {
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
@@ -39,13 +36,13 @@ namespace RICAssemblee.DataImport.RawData
         public Mandats Mandats { get; set; }
     }
 
-    public class Adresses
+    internal class Adresses
     {
         [JsonProperty("adresse", NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, string>[] Adresse { get; set; }
     }
 
-    public class EtatCivil
+    internal class EtatCivil
     {
         [JsonProperty("ident", NullValueHandling = NullValueHandling.Ignore)]
         public Ident Ident { get; set; }
@@ -57,7 +54,7 @@ namespace RICAssemblee.DataImport.RawData
         public object DateDeces { get; set; }
     }
 
-    public class Ident
+    internal class Ident
     {
         [JsonProperty("civ", NullValueHandling = NullValueHandling.Ignore)]
         public string Civ { get; set; }
@@ -75,7 +72,7 @@ namespace RICAssemblee.DataImport.RawData
         public string Trigramme { get; set; }
     }
 
-    public class InfoNaissance
+    internal class InfoNaissance
     {
         [JsonProperty("dateNais", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DateNais { get; set; }
@@ -90,13 +87,13 @@ namespace RICAssemblee.DataImport.RawData
         public string PaysNais { get; set; }
     }
 
-    public class Mandats
+    internal class Mandats
     {
         [JsonProperty("mandat", NullValueHandling = NullValueHandling.Ignore)]
         public Mandat[] Mandat { get; set; }
     }
 
-    public class Mandat
+    internal class Mandat
     {
         [JsonProperty("@xsi:type", NullValueHandling = NullValueHandling.Ignore)]
         public MandatType? XsiType { get; set; }
@@ -162,7 +159,7 @@ namespace RICAssemblee.DataImport.RawData
         public object MissionPrecedenteRef { get; set; }
     }
 
-    public class Collaborateurs
+    internal class Collaborateurs
     {
         [JsonProperty("collaborateur", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(CollaborateurConverter<Collaborateur>))]
@@ -203,7 +200,7 @@ namespace RICAssemblee.DataImport.RawData
         }
     }
 
-    public class Collaborateur
+    internal class Collaborateur
     {
         [JsonProperty("qualite", NullValueHandling = NullValueHandling.Ignore)]
         public string Qualite { get; set; }
@@ -221,7 +218,7 @@ namespace RICAssemblee.DataImport.RawData
         public object DateFin { get; set; }
     }
 
-    public class Election
+    internal class Election
     {
         [JsonProperty("lieu", NullValueHandling = NullValueHandling.Ignore)]
         public Lieu Lieu { get; set; }
@@ -233,7 +230,7 @@ namespace RICAssemblee.DataImport.RawData
         public string RefCirconscription { get; set; }
     }
 
-    public class Lieu
+    internal class Lieu
     {
         [JsonProperty("region", NullValueHandling = NullValueHandling.Ignore)]
         public string Region { get; set; }
@@ -253,13 +250,13 @@ namespace RICAssemblee.DataImport.RawData
         public long? NumCirco { get; set; }
     }
 
-    public class InfosQualite
+    internal class InfosQualite
     {
         [JsonProperty("codeQualite", NullValueHandling = NullValueHandling.Ignore)]
         public Qualite? CodeQualite { get; set; }
     }
 
-    public class Mandature
+    internal class Mandature
     {
         [JsonProperty("datePriseFonction", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DatePriseFonction { get; set; }
@@ -279,7 +276,7 @@ namespace RICAssemblee.DataImport.RawData
         public object MandatRemplaceRef { get; set; }
     }
 
-    public class Organes
+    internal class Organes
     {
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(OrganeRefConverter<string>))]
@@ -319,13 +316,13 @@ namespace RICAssemblee.DataImport.RawData
         }
     }
 
-    public class Suppleants
+    internal class Suppleants
     {
         [JsonProperty("suppleant", NullValueHandling = NullValueHandling.Ignore)]
         public Suppleant Suppleant { get; set; }
     }
 
-    public class Suppleant
+    internal class Suppleant
     {
         [JsonProperty("dateDebut", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DateDebut { get; set; }
@@ -337,7 +334,7 @@ namespace RICAssemblee.DataImport.RawData
         public string SuppleantRef { get; set; }
     }
 
-    public class Profession
+    internal class Profession
     {
         [JsonProperty("libelleCourant", NullValueHandling = NullValueHandling.Ignore)]
         public string LibelleCourant { get; set; }
@@ -346,7 +343,7 @@ namespace RICAssemblee.DataImport.RawData
         public SocProcInsee SocProcInsee { get; set; }
     }
 
-    public class SocProcInsee
+    internal class SocProcInsee
     {
         [JsonProperty("catSocPro", NullValueHandling = NullValueHandling.Ignore)]
         public string CatSocPro { get; set; }
@@ -355,7 +352,7 @@ namespace RICAssemblee.DataImport.RawData
         public string FamSocPro { get; set; }
     }
 
-    public class Uid
+    internal class Uid
     {
         [JsonProperty("@xsi:type", NullValueHandling = NullValueHandling.Ignore)]
         public string XsiType { get; set; }
@@ -364,7 +361,7 @@ namespace RICAssemblee.DataImport.RawData
         public string Text { get; set; }
     }
 
-    public static class Serialize
+    internal static class Serialize
     {
         public static string ToJson(this RawActeur self) => JsonConvert.SerializeObject(self, Converter.Settings);
     }

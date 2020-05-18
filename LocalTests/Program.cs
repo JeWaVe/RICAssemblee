@@ -13,20 +13,10 @@ namespace LocalTests
 
             //ZipFile.ExtractToDirectory("acteurs.zip", "acteurs");
 
-            var allDeputes = Directory.GetFiles("acteurs/acteur").Select(f =>
-            {
-                string content = File.ReadAllText(f);
-                try
-                {
-                    var result = RawActeur.FromJson(content).Acteur;
+            var allDeputes = RICAssemblee.DataImport.Models.Organe.FromDirectory("acteurs/organe");
 
-                    return result;
-                }
-                catch (Exception e)
-                {
-                    return null;
-                }
-            }).ToList();
+            var tmp = allDeputes.Where(d => d.Parent != null).ToList();
+
         }
     }
 }
