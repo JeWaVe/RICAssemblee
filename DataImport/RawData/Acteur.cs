@@ -108,8 +108,8 @@ namespace RICAssemblee.DataImport.RawData
 
     public class InfoNaissance
     {
-        [JsonProperty("dateNais", NullValueHandling = NullValueHandling.Ignore)]
-        public DateTimeOffset? DateNais { get; set; }
+        [JsonProperty("dateNais")]
+        public DateTimeOffset DateNais { get; set; }
 
         [JsonProperty("villeNais", NullValueHandling = NullValueHandling.Ignore)]
         public string VilleNais { get; set; }

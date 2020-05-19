@@ -1,19 +1,27 @@
 ﻿using RICAssemblee.DataImport.RawData;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
 
 namespace RICAssemblee.DataImport.Models
 {
     public class DeputeModel : BaseModel
     {
-        public BaseAdresseModel [] Adresses { get; set; }
+        public BaseAdresseModel[] Adresses { get; set; }
+
+        public string Prenom { get; set; }
+
+        public string Nom { get; set; }
+
+        public Uri UriHatvp { get; set; }
 
         public DeputeModel(Acteur rawActeur)
         {
             this.Uid = rawActeur.Uid.Text;
             ParseAddresses(rawActeur);
+
+            Prenom = rawActeur.EtatCivil.Ident.Prenom;
+            Nom = rawActeur.EtatCivil.Ident.Nom;
+            UriHatvp = rawActeur.UriHatvp;
         }
 
         private void ParseAddresses(Acteur rawActeur)
