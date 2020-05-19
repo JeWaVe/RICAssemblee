@@ -1,6 +1,9 @@
 ﻿using RICAssemblee.DataImport.RawData;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
+using System.Linq;
 
 namespace RICAssemblee.DataImport.Models
 {
@@ -14,7 +17,21 @@ namespace RICAssemblee.DataImport.Models
 
         public Uri UriHatvp { get; set; }
 
-        public DeputeModel(Acteur rawActeur)
+        public string Profession { get; set; }
+
+        public MandatModel[] Mandats { get; set; }
+
+        public static IEnumerable<DeputeModel> FromDirectory(string parentDir)
+        {
+            OrganeModel.FromDirectory(Path.Combine(parentDir, "organe"));
+            return Directory.GetFiles(Path.Combine(parentDir, "acteur")).Select(f => new DeputeModel(RawActeur.FromJson(File.ReadAllText(f)).Acteur));
+        }
+
+        /// <summary>
+        /// Organes must be parsed first
+        /// </summary>
+        /// <param name="rawActeur"></param>
+        private DeputeModel(Acteur rawActeur)
         {
             this.Uid = rawActeur.Uid.Text;
             ParseAddresses(rawActeur);
@@ -22,6 +39,25 @@ namespace RICAssemblee.DataImport.Models
             Prenom = rawActeur.EtatCivil.Ident.Prenom;
             Nom = rawActeur.EtatCivil.Ident.Nom;
             UriHatvp = rawActeur.UriHatvp;
+            Profession = rawActeur.Profession.LibelleCourant;
+
+            Mandats = new MandatModel[rawActeur.Mandats.Mandat.Length];
+            for(int i = 0; i < rawActeur.Mandats.Mandat.Length; ++i)
+            {
+                var m = rawActeur.Mandats.Mandat[i];
+                if(m.ActeurRef != rawActeur.Uid.Text)
+                {
+                    throw new InvalidDataException("le mandat ne correspond pas à l'acteur");
+                }
+                Mandats[i] = new MandatModel
+                {
+                    Debut = m.DateDebut.Value,
+                    Fin = m.DateFin,
+                    Libelle = m.Libelle,
+                    Qualite = m.InfosQualite.CodeQualite,
+                    Organes = m.Organes.OrganeRef.Select(o => OrganeModel.FromId(o)).ToArray()
+                };
+            }
         }
 
         private void ParseAddresses(Acteur rawActeur)

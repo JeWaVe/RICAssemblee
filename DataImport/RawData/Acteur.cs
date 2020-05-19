@@ -185,7 +185,7 @@ namespace RICAssemblee.DataImport.RawData
         public Collaborateurs Collaborateurs { get; set; }
 
         [JsonProperty("libelle")]
-        public object Libelle { get; set; }
+        public string Libelle { get; set; }
 
         [JsonProperty("missionSuivanteRef")]
         public object MissionSuivanteRef { get; set; }
@@ -287,8 +287,8 @@ namespace RICAssemblee.DataImport.RawData
 
     public class InfosQualite
     {
-        [JsonProperty("codeQualite", NullValueHandling = NullValueHandling.Ignore)]
-        public Qualite? CodeQualite { get; set; }
+        [JsonProperty("codeQualite")]
+        public Qualite CodeQualite { get; set; }
     }
 
     public class Mandature
