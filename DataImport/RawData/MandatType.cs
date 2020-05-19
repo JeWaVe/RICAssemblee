@@ -52,5 +52,4 @@ namespace RICAssemblee.DataImport.RawData
 
         public static readonly MandatTypeConverter Singleton = new MandatTypeConverter();
     }
-
 }

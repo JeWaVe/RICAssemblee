@@ -1,5 +1,7 @@
-﻿using RICAssemblee.DataImport.RawData;
+﻿using RICAssemblee.DataImport.Models;
+using RICAssemblee.DataImport.RawData;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -13,9 +15,10 @@ namespace LocalTests
 
             //ZipFile.ExtractToDirectory("acteurs.zip", "acteurs");
 
-            foreach(var f in Directory.GetFiles("acteurs/acteur"))
+            foreach (var f in Directory.GetFiles("acteurs/acteur"))
             {
-                var acteur = RICAssemblee.DataImport.RawData.RawActeur.FromJson(File.ReadAllText(f)).Acteur;
+                var acteur = new DeputeModel( RICAssemblee.DataImport.RawData.RawActeur.FromJson(File.ReadAllText(f)).Acteur);
+                
             }
 
             //var tmp = allOrganes.Where(d => d.Parent != null).ToList();

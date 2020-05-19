@@ -44,17 +44,12 @@ namespace RICAssemblee.DataImport.RawData
 
     public class Adresse
     {
-        [JsonProperty("@xsi:type")]
-        public AdresseType AdresseType { get; set; }
-
         [JsonProperty("uid")]
         public string Uid { get; set; }
 
         [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("typeLibelle")]
-        public string TypeLibelle { get; set; }
+        [JsonConverter(typeof(AdresseTypeConverter))]
+        public AdresseType Type { get; set; }
 
         [JsonProperty("adresseDeRattachement")]
         public string AdresseDeRattachement { get; set; }
@@ -140,6 +135,7 @@ namespace RICAssemblee.DataImport.RawData
         [JsonProperty("uid", NullValueHandling = NullValueHandling.Ignore)]
         public string Uid { get; set; }
 
+        // always equal to acteur.Uid.Text
         [JsonProperty("acteurRef", NullValueHandling = NullValueHandling.Ignore)]
         public string ActeurRef { get; set; }
 
