@@ -4,25 +4,23 @@ using System.Linq;
 
 namespace RICAssemblee.DataImport.Models
 {
-    public class Organe
+    public class OrganeModel : BaseModel
     {
         public string Libelle { get; set; }
 
         public TypeOrgane Type { get; set; }
 
-        public string Uid { get; set; }
+        public OrganeModel Parent { get; set; }
 
-        public Organe Parent { get; set; }
-
-        internal static IEnumerable<Organe> Parse(IEnumerable<RawData.Organe> rawOrganes)
+        internal static IEnumerable<OrganeModel> Parse(IEnumerable<RawData.Organe> rawOrganes)
         {
             // TODO: faster
-            var tmp = new Dictionary<string, Organe>();
+            var tmp = new Dictionary<string, OrganeModel>();
             foreach (var rawOrgane in rawOrganes)
             {
                 if(!tmp.ContainsKey(rawOrgane.Uid))
                 {
-                    tmp.Add(rawOrgane.Uid, new Organe
+                    tmp.Add(rawOrgane.Uid, new OrganeModel
                     {
                         Libelle = rawOrgane.Libelle,
                         Type = rawOrgane.CodeType,
@@ -42,7 +40,7 @@ namespace RICAssemblee.DataImport.Models
             return tmp.Values;
         }
 
-        public static IEnumerable<Organe> FromDirectory(string path)
+        public static IEnumerable<OrganeModel> FromDirectory(string path)
         {
             return Parse(RawOrgane.FromDirectory(path));
         }

@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 namespace RICAssemblee.DataImport.RawData
 {
-    internal class RawActeur
+    public class RawActeur
     {
         [JsonProperty("acteur", NullValueHandling = NullValueHandling.Ignore)]
         public Acteur Acteur { get; set; }
         public static RawActeur FromJson(string json) => JsonConvert.DeserializeObject<RawActeur>(json, Converter.Settings);
     }
 
-    internal class Acteur
+    public class Acteur
     {
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
@@ -36,13 +36,52 @@ namespace RICAssemblee.DataImport.RawData
         public Mandats Mandats { get; set; }
     }
 
-    internal class Adresses
+    public class Adresses
     {
         [JsonProperty("adresse", NullValueHandling = NullValueHandling.Ignore)]
-        public Dictionary<string, string>[] Adresse { get; set; }
+        public Adresse[] Adresse { get; set; }
     }
 
-    internal class EtatCivil
+    public class Adresse
+    {
+        [JsonProperty("@xsi:type")]
+        public AdresseType AdresseType { get; set; }
+
+        [JsonProperty("uid")]
+        public string Uid { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("typeLibelle")]
+        public string TypeLibelle { get; set; }
+
+        [JsonProperty("adresseDeRattachement")]
+        public string AdresseDeRattachement { get; set; }
+
+        [JsonProperty("valElec", NullValueHandling = NullValueHandling.Ignore)]
+        public string ValElec { get; set; }
+
+        [JsonProperty("intitule", NullValueHandling = NullValueHandling.Ignore)]
+        public string Intitule { get; set; }
+
+        [JsonProperty("numeroRue", NullValueHandling = NullValueHandling.Ignore)]
+        public string NumeroRue { get; set; }
+
+        [JsonProperty("nomRue", NullValueHandling = NullValueHandling.Ignore)]
+        public string NomRue { get; set; }
+
+        [JsonProperty("complementAdresse", NullValueHandling = NullValueHandling.Ignore)]
+        public string ComplementAdresse { get; set; }
+
+        [JsonProperty("codePostal", NullValueHandling = NullValueHandling.Ignore)]
+        public string CodePostal { get; set; }
+
+        [JsonProperty("ville", NullValueHandling = NullValueHandling.Ignore)]
+        public string Ville { get; set; }
+    }
+
+    public class EtatCivil
     {
         [JsonProperty("ident", NullValueHandling = NullValueHandling.Ignore)]
         public Ident Ident { get; set; }
@@ -54,7 +93,7 @@ namespace RICAssemblee.DataImport.RawData
         public object DateDeces { get; set; }
     }
 
-    internal class Ident
+    public class Ident
     {
         [JsonProperty("civ", NullValueHandling = NullValueHandling.Ignore)]
         public string Civ { get; set; }
@@ -72,7 +111,7 @@ namespace RICAssemblee.DataImport.RawData
         public string Trigramme { get; set; }
     }
 
-    internal class InfoNaissance
+    public class InfoNaissance
     {
         [JsonProperty("dateNais", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DateNais { get; set; }
@@ -87,13 +126,13 @@ namespace RICAssemblee.DataImport.RawData
         public string PaysNais { get; set; }
     }
 
-    internal class Mandats
+    public class Mandats
     {
         [JsonProperty("mandat", NullValueHandling = NullValueHandling.Ignore)]
         public Mandat[] Mandat { get; set; }
     }
 
-    internal class Mandat
+    public class Mandat
     {
         [JsonProperty("@xsi:type", NullValueHandling = NullValueHandling.Ignore)]
         public MandatType? XsiType { get; set; }
@@ -159,14 +198,14 @@ namespace RICAssemblee.DataImport.RawData
         public object MissionPrecedenteRef { get; set; }
     }
 
-    internal class Collaborateurs
+    public class Collaborateurs
     {
         [JsonProperty("collaborateur", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(CollaborateurConverter<Collaborateur>))]
         public IEnumerable<Collaborateur> Collaborateur { get; set; }
 
 
-        internal class CollaborateurConverter<T> : JsonConverter
+        public class CollaborateurConverter<T> : JsonConverter
         {
             public override bool CanConvert(Type objectType)
             {
@@ -200,7 +239,7 @@ namespace RICAssemblee.DataImport.RawData
         }
     }
 
-    internal class Collaborateur
+    public class Collaborateur
     {
         [JsonProperty("qualite", NullValueHandling = NullValueHandling.Ignore)]
         public string Qualite { get; set; }
@@ -218,7 +257,7 @@ namespace RICAssemblee.DataImport.RawData
         public object DateFin { get; set; }
     }
 
-    internal class Election
+    public class Election
     {
         [JsonProperty("lieu", NullValueHandling = NullValueHandling.Ignore)]
         public Lieu Lieu { get; set; }
@@ -230,7 +269,7 @@ namespace RICAssemblee.DataImport.RawData
         public string RefCirconscription { get; set; }
     }
 
-    internal class Lieu
+    public class Lieu
     {
         [JsonProperty("region", NullValueHandling = NullValueHandling.Ignore)]
         public string Region { get; set; }
@@ -250,13 +289,13 @@ namespace RICAssemblee.DataImport.RawData
         public long? NumCirco { get; set; }
     }
 
-    internal class InfosQualite
+    public class InfosQualite
     {
         [JsonProperty("codeQualite", NullValueHandling = NullValueHandling.Ignore)]
         public Qualite? CodeQualite { get; set; }
     }
 
-    internal class Mandature
+    public class Mandature
     {
         [JsonProperty("datePriseFonction", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DatePriseFonction { get; set; }
@@ -276,13 +315,13 @@ namespace RICAssemblee.DataImport.RawData
         public object MandatRemplaceRef { get; set; }
     }
 
-    internal class Organes
+    public class Organes
     {
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(OrganeRefConverter<string>))]
         public IEnumerable<string> OrganeRef { get; set; }
 
-        internal class OrganeRefConverter<T> : JsonConverter
+        public class OrganeRefConverter<T> : JsonConverter
         {
             public override bool CanConvert(Type objectType)
             {
@@ -316,13 +355,13 @@ namespace RICAssemblee.DataImport.RawData
         }
     }
 
-    internal class Suppleants
+    public class Suppleants
     {
         [JsonProperty("suppleant", NullValueHandling = NullValueHandling.Ignore)]
         public Suppleant Suppleant { get; set; }
     }
 
-    internal class Suppleant
+    public class Suppleant
     {
         [JsonProperty("dateDebut", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DateDebut { get; set; }
@@ -334,7 +373,7 @@ namespace RICAssemblee.DataImport.RawData
         public string SuppleantRef { get; set; }
     }
 
-    internal class Profession
+    public class Profession
     {
         [JsonProperty("libelleCourant", NullValueHandling = NullValueHandling.Ignore)]
         public string LibelleCourant { get; set; }
@@ -343,7 +382,7 @@ namespace RICAssemblee.DataImport.RawData
         public SocProcInsee SocProcInsee { get; set; }
     }
 
-    internal class SocProcInsee
+    public class SocProcInsee
     {
         [JsonProperty("catSocPro", NullValueHandling = NullValueHandling.Ignore)]
         public string CatSocPro { get; set; }
@@ -352,7 +391,7 @@ namespace RICAssemblee.DataImport.RawData
         public string FamSocPro { get; set; }
     }
 
-    internal class Uid
+    public class Uid
     {
         [JsonProperty("@xsi:type", NullValueHandling = NullValueHandling.Ignore)]
         public string XsiType { get; set; }
