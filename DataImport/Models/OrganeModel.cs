@@ -11,7 +11,7 @@ namespace RICAssemblee.DataImport.Models
 
         public OrganeModel Parent { get; set; }
 
-        public static OrganeModel FromId(string id)
+        internal static OrganeModel FromId(string id)
         {
             if(!IdToModel.ContainsKey(id))
             {
@@ -21,7 +21,7 @@ namespace RICAssemblee.DataImport.Models
             return IdToModel[id];
         }
 
-        public static IEnumerable<OrganeModel> FromDirectory(string path)
+        internal static IEnumerable<OrganeModel> FromDirectory(string path)
         {
             return Parse(RawOrgane.FromDirectory(path));
         }
