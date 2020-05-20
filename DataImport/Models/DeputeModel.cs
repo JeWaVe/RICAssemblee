@@ -1,7 +1,6 @@
 ﻿using RICAssemblee.DataImport.RawData;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 
@@ -19,45 +18,24 @@ namespace RICAssemblee.DataImport.Models
 
         public string Profession { get; set; }
 
-        public MandatModel[] Mandats { get; set; }
+        public HashSet<MandatModel> Mandats { get; set; }
 
-        public static IEnumerable<DeputeModel> FromDirectory(string parentDir)
-        {
-            OrganeModel.FromDirectory(Path.Combine(parentDir, "organe"));
-            return Directory.GetFiles(Path.Combine(parentDir, "acteur")).Select(f => new DeputeModel(RawActeur.FromJson(File.ReadAllText(f)).Acteur));
-        }
+        public GroupeParlementaireModel GroupeParlementaire { get; set; }
 
         /// <summary>
         /// Organes must be parsed first
         /// </summary>
         /// <param name="rawActeur"></param>
-        private DeputeModel(Acteur rawActeur)
+        internal DeputeModel(Acteur rawActeur)
         {
-            this.Uid = rawActeur.Uid.Text;
-            ParseAddresses(rawActeur);
-
+            Uid = rawActeur.Uid.Text;
             Prenom = rawActeur.EtatCivil.Ident.Prenom;
             Nom = rawActeur.EtatCivil.Ident.Nom;
             UriHatvp = rawActeur.UriHatvp;
             Profession = rawActeur.Profession.LibelleCourant;
 
-            Mandats = new MandatModel[rawActeur.Mandats.Mandat.Length];
-            for(int i = 0; i < rawActeur.Mandats.Mandat.Length; ++i)
-            {
-                var m = rawActeur.Mandats.Mandat[i];
-                if(m.ActeurRef != rawActeur.Uid.Text)
-                {
-                    throw new InvalidDataException("le mandat ne correspond pas à l'acteur");
-                }
-                Mandats[i] = new MandatModel
-                {
-                    Debut = m.DateDebut.Value,
-                    Fin = m.DateFin,
-                    Libelle = m.Libelle,
-                    Qualite = m.InfosQualite.CodeQualite,
-                    Organes = m.Organes.OrganeRef.Select(o => OrganeModel.FromId(o)).ToArray()
-                };
-            }
+            ParseAddresses(rawActeur);
+            ParseMandats(rawActeur);
         }
 
         private void ParseAddresses(Acteur rawActeur)
@@ -132,6 +110,53 @@ namespace RICAssemblee.DataImport.Models
                     {
                         throw new NotImplementedException("adresse de rattachement inconnue");
                     }
+                }
+            }
+        }
+
+        private void ParseMandats(Acteur rawActeur)
+        {
+            Mandats = new HashSet<MandatModel>();
+            for (int i = 0; i < rawActeur.Mandats.Mandat.Length; ++i)
+            {
+                var m = rawActeur.Mandats.Mandat[i];
+                if (m.ActeurRef != rawActeur.Uid.Text)
+                {
+                    throw new InvalidDataException("le mandat ne correspond pas à l'acteur");
+                }
+                var mandalModel = new MandatModel
+                {
+                    Debut = m.DateDebut.Value,
+                    Fin = m.DateFin,
+                    Uid = m.Uid,
+                    Libelle = m.Libelle,
+                    Qualite = m.InfosQualite.CodeQualite,
+                    Organes = m.Organes.OrganeRef.Select(o => OrganeModel.FromId(o)).ToArray()
+                };
+
+                if (mandalModel.Libelle == null && m.Organes.OrganeRef.Count() == 1)
+                {
+                    mandalModel.Libelle = OrganeModel.FromId(m.Organes.OrganeRef.First()).Libelle;
+                }
+
+                Mandats.Add(mandalModel);
+
+                if(m.TypeOrgane == TypeOrgane.Gp)
+                {
+                    if(m.DateFin != default && m.DateFin.HasValue && m.DateFin.Value < DateTimeOffset.Now)
+                    {
+                        continue;
+                    }
+
+                    if(m.Organes.OrganeRef.Count() > 1)
+                    {
+                        throw new NotImplementedException("groupe parlementaire avec plus d'un organe associé");
+                    }
+
+                    string gpId = m.Organes.OrganeRef.First();
+                    var organe = OrganeModel.FromId(gpId);
+
+                    GroupeParlementaire = GroupeParlementaireModel.AddDepute(gpId, organe.Libelle, this);
                 }
             }
         }

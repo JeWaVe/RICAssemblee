@@ -21,14 +21,9 @@ namespace RICAssemblee.DataImport.Models
             return IdToModel[id];
         }
 
-        internal static IEnumerable<OrganeModel> FromDirectory(string path)
-        {
-            return Parse(RawOrgane.FromDirectory(path));
-        }
-
         private static Dictionary<string, OrganeModel> IdToModel = new Dictionary<string, OrganeModel>();
 
-        private static IEnumerable<OrganeModel> Parse(IEnumerable<RawData.Organe> rawOrganes)
+        internal static IEnumerable<OrganeModel> Parse(IEnumerable<RawData.Organe> rawOrganes)
         {
             // TODO: faster
             var tmp = new Dictionary<string, OrganeModel>();

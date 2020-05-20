@@ -1,11 +1,9 @@
 ﻿using RICAssemblee.DataImport.RawData;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RICAssemblee.DataImport.Models
 {
-    public class MandatModel
+    public class MandatModel: BaseModel
     {
         public string Libelle { get; set; }
 
