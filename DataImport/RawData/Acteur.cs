@@ -197,42 +197,8 @@ namespace RICAssemblee.DataImport.RawData
     public class Collaborateurs
     {
         [JsonProperty("collaborateur", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(CollaborateurConverter<Collaborateur>))]
+        [JsonConverter(typeof(ItemOrArrayConverter<Collaborateur>))]
         public IEnumerable<Collaborateur> Collaborateur { get; set; }
-
-
-        public class CollaborateurConverter<T> : JsonConverter
-        {
-            public override bool CanConvert(Type objectType)
-            {
-                return (objectType == typeof(List<T>));
-            }
-
-            public override object ReadJson(
-              JsonReader reader,
-              Type objectType,
-              object existingValue,
-              JsonSerializer serializer)
-            {
-                JToken token = JToken.Load(reader);
-                if (token.Type == JTokenType.Array)
-                    return token.ToObject<List<T>>();
-                return new List<T> { token.ToObject<T>() };
-            }
-
-            public override bool CanWrite
-            {
-                get
-                {
-                    return false;
-                }
-            }
-
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 
     public class Collaborateur
@@ -314,41 +280,8 @@ namespace RICAssemblee.DataImport.RawData
     public class Organes
     {
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(OrganeRefConverter<string>))]
+        [JsonConverter(typeof(ItemOrArrayConverter<string>))]
         public IEnumerable<string> OrganeRef { get; set; }
-
-        public class OrganeRefConverter<T> : JsonConverter
-        {
-            public override bool CanConvert(Type objectType)
-            {
-                return (objectType == typeof(List<T>));
-            }
-
-            public override object ReadJson(
-              JsonReader reader,
-              Type objectType,
-              object existingValue,
-              JsonSerializer serializer)
-            {
-                JToken token = JToken.Load(reader);
-                if (token.Type == JTokenType.Array)
-                    return token.ToObject<List<T>>();
-                return new List<T> { token.ToObject<T>() };
-            }
-
-            public override bool CanWrite
-            {
-                get
-                {
-                    return false;
-                }
-            }
-
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 
     public class Suppleants
