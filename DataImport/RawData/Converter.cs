@@ -38,6 +38,10 @@ namespace RICAssemblee.DataImport.RawData
             {
                 return l;
             }
+            if (Int64.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out l))
+            {
+                return l;
+            }
             throw new Exception("Cannot unmarshal type long");
         }
 
