@@ -8,6 +8,23 @@ namespace RICAssemblee.DataImport.Models
 {
     public class DeputeModel : BaseModel
     {
+        // TODO: IOC here instead of ugly singleton
+        private IModelStorage _modelStorage = ModelStorage.Singleton();
+
+        internal DeputeModel(Acteur rawActeur)
+        {
+            Uid = rawActeur.Uid.Text;
+            Prenom = rawActeur.EtatCivil.Ident.Prenom;
+            Nom = rawActeur.EtatCivil.Ident.Nom;
+            UriHatvp = rawActeur.UriHatvp;
+            Profession = rawActeur.Profession.LibelleCourant;
+
+            ParseAddresses(rawActeur);
+            ParseMandats(rawActeur);
+
+            _modelStorage.Register(this.Uid, this);
+        }
+
         public BaseAdresseModel[] Adresses { get; set; }
 
         public string Prenom { get; set; }
@@ -22,25 +39,11 @@ namespace RICAssemblee.DataImport.Models
 
         public GroupeParlementaireModel GroupeParlementaire { get; set; }
 
-        /// <summary>
-        /// Organes must be parsed first
-        /// </summary>
-        /// <param name="rawActeur"></param>
-        internal DeputeModel(Acteur rawActeur)
-        {
-            Uid = rawActeur.Uid.Text;
-            Prenom = rawActeur.EtatCivil.Ident.Prenom;
-            Nom = rawActeur.EtatCivil.Ident.Nom;
-            UriHatvp = rawActeur.UriHatvp;
-            Profession = rawActeur.Profession.LibelleCourant;
 
-            ParseAddresses(rawActeur);
-            ParseMandats(rawActeur);
-        }
 
         private void ParseAddresses(Acteur rawActeur)
         {
-            this.Adresses = new BaseAdresseModel[rawActeur.Adresses.Adresse.Length];
+            Adresses = new BaseAdresseModel[rawActeur.Adresses.Adresse.Length];
             Dictionary<string, int> addressesIndex = new Dictionary<string, int>();
 
             for (int i = 0; i < rawActeur.Adresses.Adresse.Length; ++i)
@@ -51,7 +54,7 @@ namespace RICAssemblee.DataImport.Models
                 {
                     case AdresseType.Circonscription:
                     case AdresseType.Officielle:
-                        this.Adresses[i] = new AdressePostaleModel
+                        Adresses[i] = new AdressePostaleModel
                         {
                             CodePostal = add.CodePostal,
                             Complement = add.ComplementAdresse,
@@ -69,7 +72,7 @@ namespace RICAssemblee.DataImport.Models
                     case AdresseType.Twitter:
                     case AdresseType.UrlSenateur:
                     case AdresseType.Telephone:
-                        this.Adresses[i] = new AdresseReseauModel
+                        Adresses[i] = new AdresseReseauModel
                         {
                             Type = add.Type,
                             Uid = add.Uid,
@@ -81,20 +84,20 @@ namespace RICAssemblee.DataImport.Models
                 }
             }
 
-            for (int i = 0; i < this.Adresses.Length; ++i)
+            for (int i = 0; i < Adresses.Length; ++i)
             {
                 var add = rawActeur.Adresses.Adresse[i];
                 if (add.AdresseDeRattachement != null)
                 {
                     if (addressesIndex.ContainsKey(add.AdresseDeRattachement))
                     {
-                        var addReseau = this.Adresses[i] as AdresseReseauModel;
+                        var addReseau = Adresses[i] as AdresseReseauModel;
                         if (addReseau != null)
                         {
-                            var rattachement = this.Adresses[addressesIndex[add.AdresseDeRattachement]] as AdressePostaleModel;
+                            var rattachement = Adresses[addressesIndex[add.AdresseDeRattachement]] as AdressePostaleModel;
                             if (rattachement != null)
                             {
-                                addReseau.AdresseDeRattachement = this.Adresses[addressesIndex[add.AdresseDeRattachement]] as AdressePostaleModel;
+                                addReseau.AdresseDeRattachement = Adresses[addressesIndex[add.AdresseDeRattachement]] as AdressePostaleModel;
                             }
                             else
                             {
@@ -131,32 +134,33 @@ namespace RICAssemblee.DataImport.Models
                     Uid = m.Uid,
                     Libelle = m.Libelle,
                     Qualite = m.InfosQualite.CodeQualite,
-                    Organes = m.Organes.OrganeRef.Select(o => OrganeModel.FromId(o)).ToArray()
+                    Organes = m.Organes.OrganeRef.Select(o => _modelStorage.Get<OrganeModel>(o)).ToArray()
                 };
 
                 if (mandalModel.Libelle == null && m.Organes.OrganeRef.Count() == 1)
                 {
-                    mandalModel.Libelle = OrganeModel.FromId(m.Organes.OrganeRef.First()).Libelle;
+                    mandalModel.Libelle = _modelStorage.Get<OrganeModel>(m.Organes.OrganeRef.First()).Libelle;
                 }
 
                 Mandats.Add(mandalModel);
 
-                if(m.TypeOrgane == TypeOrgane.Gp)
+                if (m.TypeOrgane == TypeOrgane.Gp)
                 {
-                    if(m.DateFin != default && m.DateFin.HasValue && m.DateFin.Value < DateTimeOffset.Now)
+                    if (m.DateFin != default && m.DateFin.HasValue && m.DateFin.Value < DateTimeOffset.Now)
                     {
                         continue;
                     }
 
-                    if(m.Organes.OrganeRef.Count() > 1)
+                    if (m.Organes.OrganeRef.Count() > 1)
                     {
                         throw new NotImplementedException("groupe parlementaire avec plus d'un organe associé");
                     }
 
                     string gpId = m.Organes.OrganeRef.First();
-                    var organe = OrganeModel.FromId(gpId);
+                    var organe = _modelStorage.Get<OrganeModel>(gpId);
 
-                    GroupeParlementaire = GroupeParlementaireModel.AddDepute(gpId, organe.Libelle, this);
+                    GroupeParlementaire = _modelStorage.Get<GroupeParlementaireModel>(gpId);
+                    GroupeParlementaire.AddDepute(gpId, organe.Libelle, this);
                 }
             }
         }

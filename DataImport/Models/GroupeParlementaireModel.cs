@@ -1,32 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using RICAssemblee.DataImport.RawData;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace RICAssemblee.DataImport.Models
 {
-    // ugly design once again
-    public class GroupeParlementaireModel : BaseModel
+    public class GroupeParlementaireModel : OrganeModel
     {
+        private IModelStorage _modelStorage = ModelStorage.Singleton();
+
         public string Nom { get; private set; }
 
         public HashSet<DeputeModel> Deputes { get; private set; }
 
-        private GroupeParlementaireModel()
+        internal GroupeParlementaireModel(Organe rawOrgane) : base(rawOrgane)
         {
             Deputes = new HashSet<DeputeModel>();
         }
 
-        private static Dictionary<string, GroupeParlementaireModel> idToGP = new Dictionary<string, GroupeParlementaireModel>();
-
-        internal static GroupeParlementaireModel AddDepute(string organeRef, string groupName, DeputeModel depute)
+        internal GroupeParlementaireModel AddDepute(string organeRef, string groupName, DeputeModel depute)
         {
-            if (!idToGP.ContainsKey(organeRef))
+            if(!_modelStorage.Contains<GroupeParlementaireModel>(organeRef))
             {
-                idToGP.Add(organeRef, new GroupeParlementaireModel());
+                throw new KeyNotFoundException(string.Format($"groupe parlementaire non trouvé : {organeRef}"));
             }
 
-            idToGP[organeRef].Uid = organeRef;
-            idToGP[organeRef].Nom = groupName;
-            idToGP[organeRef].Deputes.Add(depute);
-            return idToGP[organeRef];
+            var result = _modelStorage.Get<GroupeParlementaireModel>(organeRef);
+            result.Uid = organeRef;
+            result.Nom = groupName;
+            result.Deputes.Add(depute);
+            return result;
         }
     }
 }

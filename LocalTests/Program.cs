@@ -1,5 +1,8 @@
 ﻿using RICAssemblee.DataImport.Models;
 using RICAssemblee.DataImport.RawData;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
@@ -10,12 +13,13 @@ namespace LocalTests
     {
         static void Main(string[] args)
         {
-            //new WebClient().DownloadFile("http://data.assemblee-nationale.fr/static/openData/repository/15/amo/deputes_actifs_mandats_actifs_organes_divises/AMO40_deputes_actifs_mandats_actifs_organes_divises_XV.json.zip", "acteurs.zip");
+           // new WebClient().DownloadFile("http://data.assemblee-nationale.fr/static/openData/repository/15/amo/deputes_actifs_mandats_actifs_organes_divises/AMO40_deputes_actifs_mandats_actifs_organes_divises_XV.json.zip", "acteurs.zip");
 
             //ZipFile.ExtractToDirectory("acteurs.zip", "acteurs");
-            var deputes = ModelFactory.MakeDeputes("acteurs");
+            
+            var deputes = new ModelFactory().Deputes(Path.Combine(Environment.CurrentDirectory, "acteurs")).ToList();
 
-
+            
             var adresse = deputes
                 .First() // select by name here
                 .Adresses

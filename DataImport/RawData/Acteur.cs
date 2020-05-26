@@ -2,6 +2,8 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace RICAssemblee.DataImport.RawData
 {
@@ -10,6 +12,11 @@ namespace RICAssemblee.DataImport.RawData
         [JsonProperty("acteur", NullValueHandling = NullValueHandling.Ignore)]
         public Acteur Acteur { get; set; }
         public static RawActeur FromJson(string json) => JsonConvert.DeserializeObject<RawActeur>(json, Converter.Settings);
+
+        public static IEnumerable<Acteur> FromDirectory(string dir)
+        {
+            return Directory.GetFiles(dir).Select(f => FromJson(File.ReadAllText(f)).Acteur);
+        }
     }
 
     public class Acteur

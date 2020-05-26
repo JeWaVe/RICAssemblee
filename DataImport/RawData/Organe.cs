@@ -11,6 +11,7 @@ namespace RICAssemblee.DataImport.RawData
     {
         [JsonProperty("organe", NullValueHandling = NullValueHandling.Ignore)]
         public Organe Organe { get; set; }
+
         public static RawOrgane FromJson(string json) => JsonConvert.DeserializeObject<RawOrgane>(json, Converter.Settings);
 
         public static IEnumerable<Organe> FromDirectory(string path)
@@ -19,7 +20,7 @@ namespace RICAssemblee.DataImport.RawData
         }
     }
 
-    internal partial class Organe
+    public partial class Organe
     {
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
@@ -62,7 +63,7 @@ namespace RICAssemblee.DataImport.RawData
         public Secretariat Secretariat { get; set; }
     }
 
-    internal partial class Secretariat
+    public partial class Secretariat
     {
         [JsonProperty("secretaire01")]
         public string Secretaire01 { get; set; }
@@ -71,7 +72,7 @@ namespace RICAssemblee.DataImport.RawData
         public string Secretaire02 { get; set; }
     }
 
-    internal partial class ViMoDe
+    public partial class ViMoDe
     {
         [JsonProperty("dateDebut", NullValueHandling = NullValueHandling.Ignore)]
         public DateTimeOffset? DateDebut { get; set; }
