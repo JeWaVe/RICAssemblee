@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RICAssemblee.DataImport.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Linq;
 
 namespace RICAssemblee.DataImport.RawData
 {
-    public class RawActeur
+    internal class RawActeur
     {
         [JsonProperty("acteur", NullValueHandling = NullValueHandling.Ignore)]
         public Acteur Acteur { get; set; }
@@ -15,17 +16,35 @@ namespace RICAssemblee.DataImport.RawData
 
         public static IEnumerable<Acteur> FromDirectory(string dir)
         {
-            return Directory.GetFiles(dir).Select(f => FromJson(File.ReadAllText(f)).Acteur);
+            return Directory.GetFiles(dir).Select(f =>
+            {
+                var result = FromJson(File.ReadAllText(f)).Acteur;
+                ObjectStorage<BaseRawData>.Singleton().Register(result.Uid, result);
+                return result;
+            });
         }
     }
 
-    public class Acteur
+    internal class Acteur : BaseRawData
     {
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
 
         [JsonProperty("uid")]
-        public Uid Uid { get; set; }
+        public Uid rawId { get; set; }
+
+        [JsonIgnore]
+        public override string Uid
+        {
+            get
+            {
+                return rawId.Text;
+            }
+            set
+            {
+                rawId.Text = value;
+            }
+        }
 
         [JsonProperty("etatCivil", NullValueHandling = NullValueHandling.Ignore)]
         public EtatCivil EtatCivil { get; set; }

@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-
-namespace RICAssemblee.DataImport.Models
+﻿namespace RICAssemblee.DataImport.Models
 {
     public class BaseModel
     {
+        // TODO: IOC here instead of ugly singleton
+        protected IModelStorage<BaseModel> _modelStorage = ObjectStorage<BaseModel>.Singleton();
+
         public string Uid { get; set; }
 
         public override bool Equals(object obj)

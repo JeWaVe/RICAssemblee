@@ -1,27 +1,39 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace RICAssemblee.DataImport.RawData
 {
-    public partial class RawScrutin
+    internal class RawScrutin
     {
         [JsonProperty("scrutin", NullValueHandling = NullValueHandling.Ignore)]
         public Scrutin Scrutin { get; set; }
 
         public static RawScrutin FromJson(string json) => JsonConvert.DeserializeObject<RawScrutin>(json, Converter.Settings);
+
+        public static IEnumerable<Scrutin> FromDirectory(string dir) {
+            var result = new List<Scrutin>();
+            foreach (var f in Directory.GetFiles(dir))
+            {
+                result.Add(FromJson(File.ReadAllText(f)).Scrutin);
+            }
+
+            return result;
+        }
     }
 
-    public partial class Scrutin
+    internal class Scrutin : BaseRawData
     {
+        [JsonIgnore]
+        public override string Uid { get; set; }
+
         [JsonProperty("@xmlns", NullValueHandling = NullValueHandling.Ignore)]
         public Uri Xmlns { get; set; }
 
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
-
-        [JsonProperty("uid", NullValueHandling = NullValueHandling.Ignore)]
-        public string Uid { get; set; }
 
         [JsonProperty("numero", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -76,7 +88,7 @@ namespace RICAssemblee.DataImport.RawData
         //public MiseAuPoint MiseAuPoint { get; set; }
     }
 
-    public partial class Demandeur
+    internal class Demandeur
     {
         [JsonProperty("texte", NullValueHandling = NullValueHandling.Ignore)]
         public string Texte { get; set; }
@@ -85,7 +97,7 @@ namespace RICAssemblee.DataImport.RawData
         public object ReferenceLegislative { get; set; }
     }
 
-    public partial class MiseAuPoint
+    internal class MiseAuPoint
     {
         [JsonProperty("nonVotants", NullValueHandling = NullValueHandling.Ignore)]
         public VotantWrapper NonVotants { get; set; }
@@ -106,7 +118,7 @@ namespace RICAssemblee.DataImport.RawData
         public Decompte Dysfonctionnement { get; set; }
     }
 
-    public partial class Decompte
+    internal class Decompte
     {
         [JsonProperty("nonVotants")]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -129,7 +141,7 @@ namespace RICAssemblee.DataImport.RawData
         public long? NonVotantsVolontaires { get; set; }
     }
 
-    public partial class Objet
+    internal class Objet
     {
         [JsonProperty("libelle", NullValueHandling = NullValueHandling.Ignore)]
         public string Libelle { get; set; }
@@ -138,7 +150,7 @@ namespace RICAssemblee.DataImport.RawData
         public object ReferenceLegislative { get; set; }
     }
 
-    public partial class Sort
+    internal class Sort
     {
         [JsonProperty("code", NullValueHandling = NullValueHandling.Ignore)]
         public string Code { get; set; }
@@ -147,7 +159,7 @@ namespace RICAssemblee.DataImport.RawData
         public string Libelle { get; set; }
     }
 
-    public partial class SyntheseVote
+    internal class SyntheseVote
     {
         [JsonProperty("nombreVotants", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -168,7 +180,7 @@ namespace RICAssemblee.DataImport.RawData
         public Decompte Decompte { get; set; }
     }
 
-    public partial class TypeVote
+    internal class TypeVote
     {
         [JsonProperty("codeTypeVote", NullValueHandling = NullValueHandling.Ignore)]
         public string CodeTypeVote { get; set; }
@@ -180,13 +192,13 @@ namespace RICAssemblee.DataImport.RawData
         public string TypeMajorite { get; set; }
     }
 
-    public partial class VentilationVotes
+    internal class VentilationVotes
     {
         [JsonProperty("organe", NullValueHandling = NullValueHandling.Ignore)]
         public OrganeScrutin OrganeScrutin { get; set; }
     }
 
-    public partial class OrganeScrutin
+    internal class OrganeScrutin
     {
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
         public string OrganeRef { get; set; }
@@ -195,13 +207,13 @@ namespace RICAssemblee.DataImport.RawData
         public Groupes Groupes { get; set; }
     }
 
-    public partial class Groupes
+    internal class Groupes
     {
         [JsonProperty("groupe", NullValueHandling = NullValueHandling.Ignore)]
         public Groupe[] Groupe { get; set; }
     }
 
-    public partial class Groupe
+    internal class Groupe
     {
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
         public string OrganeRef { get; set; }
@@ -214,7 +226,7 @@ namespace RICAssemblee.DataImport.RawData
         public Vote Vote { get; set; }
     }
 
-    public partial class Vote
+    internal class Vote
     {
         [JsonProperty("positionMajoritaire", NullValueHandling = NullValueHandling.Ignore)]
         public PositionMajoritaire? PositionMajoritaire { get; set; }
@@ -226,7 +238,7 @@ namespace RICAssemblee.DataImport.RawData
         public DecompteNominatif DecompteNominatif { get; set; }
     }
 
-    public partial class DecompteNominatif
+    internal class DecompteNominatif
     {
         [JsonProperty("pours")]
         public VotantWrapper Pours { get; set; }
@@ -241,14 +253,14 @@ namespace RICAssemblee.DataImport.RawData
         public VotantWrapper NonVotants { get; set; }
     }
 
-    public class VotantWrapper
+    internal class VotantWrapper
     {
         [JsonProperty("votant")]
         [JsonConverter(typeof(ItemOrArrayConverter<Votant>))]
         public IEnumerable<Votant> Votant { get; set; }
     }
 
-    public class Votant
+    internal class Votant
     {
         [JsonProperty("acteurRef", NullValueHandling = NullValueHandling.Ignore)]
         public string ActeurRef { get; set; }

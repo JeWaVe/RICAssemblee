@@ -8,12 +8,9 @@ namespace RICAssemblee.DataImport.Models
 {
     public class DeputeModel : BaseModel
     {
-        // TODO: IOC here instead of ugly singleton
-        private IModelStorage _modelStorage = ModelStorage.Singleton();
-
         internal DeputeModel(Acteur rawActeur)
         {
-            Uid = rawActeur.Uid.Text;
+            Uid = rawActeur.Uid;
             Prenom = rawActeur.EtatCivil.Ident.Prenom;
             Nom = rawActeur.EtatCivil.Ident.Nom;
             UriHatvp = rawActeur.UriHatvp;
@@ -123,7 +120,7 @@ namespace RICAssemblee.DataImport.Models
             for (int i = 0; i < rawActeur.Mandats.Mandat.Length; ++i)
             {
                 var m = rawActeur.Mandats.Mandat[i];
-                if (m.ActeurRef != rawActeur.Uid.Text)
+                if (m.ActeurRef != rawActeur.Uid)
                 {
                     throw new InvalidDataException("le mandat ne correspond pas à l'acteur");
                 }
@@ -146,21 +143,21 @@ namespace RICAssemblee.DataImport.Models
 
                 if (m.TypeOrgane == TypeOrgane.Gp)
                 {
-                    if (m.DateFin != default && m.DateFin.HasValue && m.DateFin.Value < DateTimeOffset.Now)
-                    {
-                        continue;
-                    }
-
                     if (m.Organes.OrganeRef.Count() > 1)
                     {
                         throw new NotImplementedException("groupe parlementaire avec plus d'un organe associé");
                     }
 
-                    string gpId = m.Organes.OrganeRef.First();
-                    var organe = _modelStorage.Get<OrganeModel>(gpId);
+                    // attention les groupes parlementaires perdent des membres et ne sont pas recréés... 
+                    var groupeParlementaire = _modelStorage.Get<GroupeParlementaireModel>(m.Organes.OrganeRef.First());
 
-                    GroupeParlementaire = _modelStorage.Get<GroupeParlementaireModel>(gpId);
-                    GroupeParlementaire.AddDepute(gpId, organe.Libelle, this);
+                    if (m.DateFin != default && m.DateFin.HasValue && m.DateFin.Value < DateTimeOffset.Now)
+                    {
+                        continue;
+                    }
+
+                    groupeParlementaire.Deputes.Add(this);
+                    GroupeParlementaire = groupeParlementaire;
                 }
             }
         }

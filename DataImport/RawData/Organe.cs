@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-
+using RICAssemblee.DataImport.Models;
 
 namespace RICAssemblee.DataImport.RawData
 {
-    internal partial class RawOrgane
+    internal class RawOrgane
     {
         [JsonProperty("organe", NullValueHandling = NullValueHandling.Ignore)]
         public Organe Organe { get; set; }
@@ -16,17 +16,22 @@ namespace RICAssemblee.DataImport.RawData
 
         public static IEnumerable<Organe> FromDirectory(string path)
         {
-            return Directory.GetFiles(path).Select(f => FromJson(File.ReadAllText(f)).Organe);
+            return Directory.GetFiles(path).Select(f =>
+            {
+                var result = FromJson(File.ReadAllText(f)).Organe;
+                ObjectStorage<BaseRawData>.Singleton().Register(result.Uid, result);
+                return result;
+            });
         }
     }
 
-    public partial class Organe
+    internal class Organe : BaseRawData
     {
         [JsonProperty("@xmlns:xsi", NullValueHandling = NullValueHandling.Ignore)]
         public Uri XmlnsXsi { get; set; }
 
         [JsonProperty("uid")]
-        public string Uid { get; set; }
+        public override string Uid { get; set; }
 
         [JsonProperty("codeType", NullValueHandling = NullValueHandling.Ignore)]
         public TypeOrgane CodeType { get; set; }

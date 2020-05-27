@@ -4,9 +4,6 @@ namespace RICAssemblee.DataImport.Models
 {
     public class OrganeModel : BaseModel
     {
-        // TODO: IOC here instead of ugly singleton
-        private IModelStorage _modelStorage = ModelStorage.Singleton();
-
         internal OrganeModel(Organe rawOrgane)
         {
             this.Uid = rawOrgane.Uid.ToLowerInvariant();

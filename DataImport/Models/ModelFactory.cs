@@ -10,7 +10,7 @@ namespace RICAssemblee.DataImport.Models
     {
 
         // TODO: IOC here instead of ugly singleton
-        private IModelStorage _modelStorage = ModelStorage.Singleton();
+        private IModelStorage<BaseModel> _modelStorage = ObjectStorage<BaseModel>.Singleton();
 
         public IEnumerable<OrganeModel> Organes(string parentDir)
         {
@@ -41,9 +41,23 @@ namespace RICAssemblee.DataImport.Models
 
         public IEnumerable<DeputeModel> Deputes(string parentDir)
         {
-            // TODO : memoize that
-            var organes = Organes(parentDir);
-            return RawActeur.FromDirectory(Path.Combine(parentDir, "acteur")).Select(rawActeur => new DeputeModel(rawActeur));
+            var result = new List<DeputeModel>();
+            foreach (var rawActeur in RawActeur.FromDirectory(Path.Combine(parentDir, "acteur")))
+            {
+                result.Add(new DeputeModel(rawActeur));
+            }
+
+            return result;
+        }
+        public IEnumerable<ScrutinModel> Scrutins(string directory)
+        {
+            var result = new List<ScrutinModel>();
+            foreach(var rawScrutin in RawScrutin.FromDirectory(directory))
+            {
+                result.Add(new ScrutinModel(rawScrutin));
+            }
+
+            return result;
         }
     }
 }
