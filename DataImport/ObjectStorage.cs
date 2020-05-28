@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace RICAssemblee.DataImport.Models
 {
-    public interface IModelStorage<TBase> where TBase : class
+    public interface IObjectStorage<TBase> where TBase : class
     {
         IEnumerable<TBase> All { get; }
 
@@ -18,7 +16,7 @@ namespace RICAssemblee.DataImport.Models
     }
 
 
-    public class ObjectStorage<TBase> : IModelStorage<TBase> where TBase : class
+    public class ObjectStorage<TBase> : IObjectStorage<TBase> where TBase : class
     {
         private Dictionary<string, TBase> _container;
 

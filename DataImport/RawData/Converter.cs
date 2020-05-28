@@ -18,7 +18,6 @@ namespace RICAssemblee.DataImport.RawData
                 MandatTypeConverter.Singleton,
                 QualiteConverter.Singleton,
                 TypeOrganeConverter.Singleton,
-                CausePositionVoteConverter.Singleton,
                 PositionMajoritaireConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },

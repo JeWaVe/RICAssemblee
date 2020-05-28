@@ -1,8 +1,6 @@
 ﻿using RICAssemblee.DataImport.RawData;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace RICAssemblee.DataImport.Models
 {
@@ -10,7 +8,7 @@ namespace RICAssemblee.DataImport.Models
     {
 
         // TODO: IOC here instead of ugly singleton
-        private IModelStorage<BaseModel> _modelStorage = ObjectStorage<BaseModel>.Singleton();
+        private IObjectStorage<BaseModel> _modelStorage = ObjectStorage<BaseModel>.Singleton();
 
         public IEnumerable<OrganeModel> Organes(string parentDir)
         {

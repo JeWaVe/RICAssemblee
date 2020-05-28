@@ -1,13 +1,10 @@
 ﻿using RICAssemblee.DataImport.RawData;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
 namespace RICAssemblee.DataImport.Models
 {
     public class GroupeParlementaireModel : OrganeModel
     {
-        public string Nom { get; private set; }
 
         public HashSet<DeputeModel> Deputes { get; private set; }
 

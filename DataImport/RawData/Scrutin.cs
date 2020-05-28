@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace RICAssemblee.DataImport.RawData
 {
@@ -27,7 +26,7 @@ namespace RICAssemblee.DataImport.RawData
     internal class Scrutin : BaseRawData
     {
         [JsonIgnore]
-        public override string Uid { get; set; }
+        public override string Uid { get { return SessionRef; } set { throw new Exception("cannot set scrutin Uid"); } }
 
         [JsonProperty("@xmlns", NullValueHandling = NullValueHandling.Ignore)]
         public Uri Xmlns { get; set; }
@@ -167,7 +166,7 @@ namespace RICAssemblee.DataImport.RawData
 
         [JsonProperty("suffragesExprimes", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ParseStringConverter))]
-        public long? SuffragesExprimes { get; set; }
+        public long SuffragesExprimes { get; set; }
 
         [JsonProperty("nbrSuffragesRequis", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -272,10 +271,11 @@ namespace RICAssemblee.DataImport.RawData
         public bool? ParDelegation { get; set; }
 
         [JsonProperty("causePositionVote", NullValueHandling = NullValueHandling.Ignore)]
-        public CausePositionVote? CausePositionVote { get; set; }
+        [JsonConverter(typeof(CausePositionVoteConverter))]
+        public CausePositionVote CausePositionVote { get; set; }
     }
 
-    public enum CausePositionVote { Mg, Pan, Pse };
+    public enum CausePositionVote { MembreGouvernement, PresidentAssembleeNationale, PresidentSceance, PositionPersonnelle };
 
     public enum PositionMajoritaire { Abstention, Contre, Pour };
 
@@ -290,13 +290,14 @@ namespace RICAssemblee.DataImport.RawData
             switch (value)
             {
                 case "MG":
-                    return CausePositionVote.Mg;
+                    return CausePositionVote.MembreGouvernement;
                 case "PAN":
-                    return CausePositionVote.Pan;
+                    return CausePositionVote.PresidentAssembleeNationale;
                 case "PSE":
-                    return CausePositionVote.Pse;
+                    return CausePositionVote.PresidentSceance;
+                default:
+                    return CausePositionVote.PositionPersonnelle;
             }
-            throw new Exception("Cannot unmarshal type CausePositionVote");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -309,17 +310,20 @@ namespace RICAssemblee.DataImport.RawData
             var value = (CausePositionVote)untypedValue;
             switch (value)
             {
-                case CausePositionVote.Mg:
+                case CausePositionVote.MembreGouvernement:
                     serializer.Serialize(writer, "MG");
                     return;
-                case CausePositionVote.Pan:
+                case CausePositionVote.PresidentAssembleeNationale:
                     serializer.Serialize(writer, "PAN");
                     return;
-                case CausePositionVote.Pse:
+                case CausePositionVote.PresidentSceance:
                     serializer.Serialize(writer, "PSE");
                     return;
+                case CausePositionVote.PositionPersonnelle:
+                default:
+                    serializer.Serialize(writer, "PP");
+                    return;
             }
-            throw new Exception("Cannot marshal type CausePositionVote");
         }
 
         public static readonly CausePositionVoteConverter Singleton = new CausePositionVoteConverter();

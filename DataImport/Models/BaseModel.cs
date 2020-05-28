@@ -3,7 +3,7 @@
     public class BaseModel
     {
         // TODO: IOC here instead of ugly singleton
-        protected IModelStorage<BaseModel> _modelStorage = ObjectStorage<BaseModel>.Singleton();
+        protected IObjectStorage<BaseModel> _modelStorage = ObjectStorage<BaseModel>.Singleton();
 
         public string Uid { get; set; }
 

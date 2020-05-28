@@ -7,13 +7,13 @@ namespace RICAssemblee.DataImport.Models
         internal OrganeModel(Organe rawOrgane)
         {
             this.Uid = rawOrgane.Uid.ToLowerInvariant();
-            this.Libelle = rawOrgane.Libelle;
+            this.Nom = rawOrgane.Libelle;
             this.Type = rawOrgane.CodeType;
 
             _modelStorage.Register(this.Uid, this);
         }
 
-        public string Libelle { get; set; }
+        public string Nom { get; set; }
 
         public TypeOrgane Type { get; set; }
 

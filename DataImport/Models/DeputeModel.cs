@@ -136,7 +136,7 @@ namespace RICAssemblee.DataImport.Models
 
                 if (mandalModel.Libelle == null && m.Organes.OrganeRef.Count() == 1)
                 {
-                    mandalModel.Libelle = _modelStorage.Get<OrganeModel>(m.Organes.OrganeRef.First()).Libelle;
+                    mandalModel.Libelle = _modelStorage.Get<OrganeModel>(m.Organes.OrganeRef.First()).Nom;
                 }
 
                 Mandats.Add(mandalModel);
