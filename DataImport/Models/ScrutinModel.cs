@@ -17,6 +17,8 @@ namespace RICAssemblee.DataImport.Models
 
         public string Annonce { get; set; }
 
+        public int Numero { get; set; }
+
         public Vote GetVote(DeputeModel depute)
         {
             foreach (var groupe in Results)
@@ -53,6 +55,7 @@ namespace RICAssemblee.DataImport.Models
         internal ScrutinModel(Scrutin rawScrutin)
         {
             this.Uid = rawScrutin.Uid;
+            this.Numero = (int) rawScrutin.Numero;
             this.Titre = rawScrutin.Titre;
             this.Demandeur = rawScrutin.Demandeur.Texte;
             this.Date = rawScrutin.DateScrutin.GetValueOrDefault();
@@ -113,6 +116,7 @@ namespace RICAssemblee.DataImport.Models
                     return Vote.Inconnu;
                 } 
             }
+
             public GroupeParlementaireModel Groupe { get; set; }
 
             public HashSet<VoteDepute> NonVotants { get; set; }

@@ -36,7 +36,7 @@ namespace RICAssemblee.DataImport.RawData
 
         [JsonProperty("numero", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ParseStringConverter))]
-        public long? Numero { get; set; }
+        public long Numero { get; set; }
 
         [JsonProperty("organeRef", NullValueHandling = NullValueHandling.Ignore)]
         public string OrganeRef { get; set; }
