@@ -62,7 +62,7 @@ namespace RICAssemblee.DataImport.RawData
 
         [JsonProperty("legislature", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(ParseStringConverter))]
-        public long? Legislature { get; set; }
+        public long Legislature { get; set; }
 
         [JsonProperty("secretariat", NullValueHandling = NullValueHandling.Ignore)]
         public Secretariat Secretariat { get; set; }
